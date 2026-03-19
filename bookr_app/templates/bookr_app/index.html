@@ -1,0 +1,147 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookr - Liste des Livres</title>
+    <link rel="stylesheet" href="{% static 'bookr_app/css/style.css' %}">
+</head>
+<body>
+    <div class="container">
+        <h1>Bookr - Gestion de Livres</h1>
+
+        <!-- 1. Tous les livres créés -->
+        <div class="section">
+            <h2>1. Tous les livres créés</h2>
+            <div class="book-grid">
+                {% for livre in tous_les_livres %}
+                <div class="book-card">
+                    <div class="book-title">{{ livre.nom }}</div>
+                    <div class="book-price">{{ livre.prix }} €</div>
+                    <div class="book-info">
+                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
+                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-result">Aucun livre trouvé</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 2. Livres qui commencent par "L" -->
+        <div class="section">
+            <h2>2. Livres qui commencent par "L"</h2>
+            <div class="book-grid">
+                {% for livre in livres_commencent_L %}
+                <div class="book-card">
+                    <div class="book-title">{{ livre.nom }}</div>
+                    <div class="book-price">{{ livre.prix }} €</div>
+                    <div class="book-info">
+                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
+                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-result">Aucun livre commençant par "L"</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 3. Livres contenant "Misérables" -->
+        <div class="section">
+            <h2>3. Livres contenant "Misérables" dans le titre</h2>
+            <div class="book-grid">
+                {% for livre in livres_avec_miserables %}
+                <div class="book-card">
+                    <div class="book-title">{{ livre.nom }}</div>
+                    <div class="book-price">{{ livre.prix }} €</div>
+                    <div class="book-info">
+                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
+                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-result">Aucun livre contenant "Misérables"</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 4. Livres avec prix >= 10 -->
+        <div class="section">
+            <h2>4. Livres dont le prix est >= 10 €</h2>
+            <div class="book-grid">
+                {% for livre in livres_prix_gte_10 %}
+                <div class="book-card">
+                    <div class="book-title">{{ livre.nom }}</div>
+                    <div class="book-price">{{ livre.prix }} €</div>
+                    <div class="book-info">
+                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
+                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-result">Aucun livre avec prix >= 10 €</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 5. Livres prix >= 10 ET toujours publié -->
+        <div class="section">
+            <h2>5. Livres prix >= 10 € ET statut "toujours publié"</h2>
+            <div class="book-grid">
+                {% for livre in livres_prix_10_et_publie %}
+                <div class="book-card">
+                    <div class="book-title">{{ livre.nom }}</div>
+                    <div class="book-price">{{ livre.prix }} €</div>
+                    <div class="book-info">
+                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
+                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="no-result">Aucun livre correspondant à ces critères</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 6. Livre avec le prix le plus élevé -->
+        <div class="section">
+            <h2>6. Livre avec le prix le plus élevé</h2>
+            {% if livre_prix_max %}
+            <div class="highlight">
+                <div class="book-title">{{ livre_prix_max.nom }}</div>
+                <div class="book-price">{{ livre_prix_max.prix }} €</div>
+                <div class="book-info">
+                    <span class="badge badge-type">{{ livre_prix_max.livre_type.genre }}</span>
+                    <span class="badge badge-status">{{ livre_prix_max.livre_status.status }}</span>
+                </div>
+            </div>
+            {% else %}
+            <div class="no-result">Aucun livre trouvé</div>
+            {% endif %}
+        </div>
+
+        <!-- 7. Liste des statuts -->
+        <div class="section">
+            <h2>7. Liste des statuts de nos livres</h2>
+            <div class="status-list">
+                {% for status in statuts_livres %}
+                <div class="status-item">{{ status.status }}</div>
+                {% empty %}
+                <div class="no-result">Aucun statut trouvé</div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- 8. Nombre total de livres -->
+        <div class="section">
+            <h2>8. Nombre total de livres</h2>
+            <div class="highlight">
+                <span class="count-badge">{{ nombre_total_livres }} livre{{ nombre_total_livres|pluralize }}</span>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
