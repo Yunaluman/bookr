@@ -1,0 +1,49 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}{{ titre }} — Backoffice{% endblock %}
+
+{% block content %}
+<div class="mb-8">
+    <a href="{% url 'backoffice:auteurs_list' %}" class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm mb-6 transition-colors">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Retour à la liste
+    </a>
+    <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Auteurs</p>
+    <h1 class="text-3xl font-bold text-white">{{ titre }}</h1>
+</div>
+
+<form method="post" class="max-w-lg">
+    {% csrf_token %}
+    <div class="bg-zinc-900 rounded-xl border border-zinc-800 p-6 space-y-5">
+        {% for field in form %}
+        <div>
+            <label class="block text-xs font-semibold text-zinc-400 uppercase tracking-widest mb-2">
+                {{ field.label }}{% if field.field.required %} <span class="text-amber-400">*</span>{% endif %}
+            </label>
+            <div class="[&>input]:w-full [&>input]:bg-zinc-800 [&>input]:border [&>input]:border-zinc-700 [&>input]:text-white [&>input]:rounded-lg [&>input]:px-4 [&>input]:py-2.5 [&>input]:text-sm [&>input]:focus:outline-none [&>input]:focus:border-amber-400">
+                {{ field }}
+            </div>
+            {% if field.errors %}
+            <p class="text-red-400 text-xs mt-1">{{ field.errors|join:", " }}</p>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="flex gap-3 mt-6">
+        <button type="submit" class="bg-amber-400 text-black font-semibold px-6 py-2.5 rounded-lg hover:bg-amber-300 transition-colors text-sm">
+            Enregistrer
+        </button>
+        <a href="{% url 'backoffice:auteurs_list' %}" class="border border-zinc-700 text-zinc-300 px-6 py-2.5 rounded-lg hover:border-zinc-500 hover:text-white transition-colors text-sm">
+            Annuler
+        </a>
+        {% if auteur %}
+        <a href="{% url 'backoffice:auteur_delete' auteur.pk %}" class="ml-auto text-red-400 border border-red-900 px-4 py-2.5 rounded-lg hover:border-red-700 hover:text-red-300 transition-colors text-sm">
+            Supprimer
+        </a>
+        {% endif %}
+    </div>
+</form>
+{% endblock %}

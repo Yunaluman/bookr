@@ -1,0 +1,12 @@
+<div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800 hover:border-zinc-600 transition-colors">
+    <div class="flex items-start justify-between gap-4">
+        <div class="flex-1 min-w-0">
+            <h3 class="font-semibold text-white text-sm truncate">{{ livre.nom }}</h3>
+            <div class="flex items-center gap-2 mt-2 flex-wrap">
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_type.genre }}</span>
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_status.status }}</span>
+            </div>
+        </div>
+        <span class="text-amber-400 font-bold text-lg shrink-0">{{ livre.prix }}€</span>
+    </div>
+</div>

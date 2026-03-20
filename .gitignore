@@ -31,3 +31,6 @@ Thumbs.db
 # Environment variables
 .env
 .env.local
+
+# Node (dépendances de build Tailwind dans theme/static_src/ et ailleurs)
+node_modules/

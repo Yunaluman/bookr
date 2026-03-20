@@ -1,0 +1,53 @@
+{% extends "bookr_app/base.html" %}
+
+{% block title %}Bookr — {{ auteur }}{% endblock %}
+
+{% block content %}
+<div class="px-6 py-10">
+    <div class="max-w-7xl mx-auto">
+
+        <a href="{% url 'bookr_app:auteurs_list' %}" class="inline-flex items-center gap-2 text-zinc-400 hover:text-white text-sm mb-8 transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+            </svg>
+            Tous les auteurs
+        </a>
+
+        <div class="mb-10">
+            <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Auteur</p>
+            <h1 class="text-4xl font-bold text-white mb-1">{{ auteur }}</h1>
+            {% if auteur.nationalite %}
+            <p class="text-zinc-400 text-sm">{{ auteur.nationalite }}</p>
+            {% endif %}
+        </div>
+
+        <div class="flex items-center gap-2 mb-6">
+            <span class="text-zinc-500 text-sm">{{ livres|length }} livre{{ livres|length|pluralize }}</span>
+        </div>
+
+        <div class="border-b border-zinc-800 mb-6"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for livre in livres %}
+            <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800 hover:border-zinc-600 transition-colors">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-white truncate">{{ livre.nom }}</h3>
+                        <div class="flex items-center gap-2 mt-2 flex-wrap">
+                            <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_type.genre }}</span>
+                            <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_status.status }}</span>
+                        </div>
+                    </div>
+                    <span class="text-amber-400 font-bold text-lg shrink-0">{{ livre.prix }}€</span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="col-span-3 text-center py-16 text-zinc-500">
+                <p>Aucun livre pour cet auteur</p>
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

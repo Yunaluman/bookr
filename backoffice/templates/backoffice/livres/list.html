@@ -1,0 +1,56 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Livres — Backoffice{% endblock %}
+
+{% block content %}
+<div class="flex items-start justify-between mb-8">
+    <div>
+        <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Gestion</p>
+        <h1 class="text-3xl font-bold text-white">Livres</h1>
+        <p class="text-zinc-400 text-sm mt-1">{{ livres|length }} livre{{ livres|length|pluralize }} dans le catalogue</p>
+    </div>
+    <a href="{% url 'backoffice:livre_create' %}" class="bg-amber-400 text-black font-semibold px-5 py-3 rounded-lg hover:bg-amber-300 transition-colors text-sm">
+        + Ajouter un livre
+    </a>
+</div>
+
+<div class="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="border-b border-zinc-800">
+                <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Titre</th>
+                <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Auteur</th>
+                <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Genre</th>
+                <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Statut</th>
+                <th class="text-right px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Prix</th>
+                <th class="px-5 py-3"></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for livre in livres %}
+            <tr class="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                <td class="px-5 py-4 font-medium text-white">{{ livre.nom }}</td>
+                <td class="px-5 py-4 text-zinc-400">{{ livre.auteur|default:"—" }}</td>
+                <td class="px-5 py-4">
+                    <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_type.genre }}</span>
+                </td>
+                <td class="px-5 py-4">
+                    <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_status.status }}</span>
+                </td>
+                <td class="px-5 py-4 text-right text-amber-400 font-bold">{{ livre.prix }}€</td>
+                <td class="px-5 py-4 text-right">
+                    <div class="flex items-center justify-end gap-2">
+                        <a href="{% url 'backoffice:livre_update' livre.pk %}" class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-2 py-1 rounded transition-colors">Modifier</a>
+                        <a href="{% url 'backoffice:livre_delete' livre.pk %}" class="text-xs text-red-400 hover:text-red-300 border border-red-900 hover:border-red-700 px-2 py-1 rounded transition-colors">Supprimer</a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="px-5 py-12 text-center text-zinc-500">Aucun livre dans le catalogue</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
