@@ -99,6 +99,7 @@ DATABASES = {
         "PASSWORD": config("DB_PASSWORD"),
         "HOST": config("DB_HOST", default="localhost"),
         "PORT": config("DB_PORT", default="5432"),
+        "OPTIONS": config("DB_SSLMODE", default="", cast=lambda v: {"sslmode": v} if v else {}),
     }
 }
 
