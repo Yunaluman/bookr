@@ -1,0 +1,145 @@
+{% extends "backoffice/base.html" %}
+
+{% block title %}Dashboard — Backoffice{% endblock %}
+
+{% block content %}
+<div class="mb-10">
+    <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Backoffice</p>
+    <h1 class="text-4xl font-bold text-white mb-2">Dashboard</h1>
+</div>
+
+<!-- Stats -->
+<div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-12">
+    <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
+        <p class="text-3xl font-bold text-white">{{ nombre_total_livres }}</p>
+        <p class="text-zinc-500 text-xs font-semibold tracking-widest uppercase mt-1">Total Livres</p>
+    </div>
+    <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
+        <p class="text-3xl font-bold text-white">{{ nombre_auteurs }}</p>
+        <p class="text-zinc-500 text-xs font-semibold tracking-widest uppercase mt-1">Auteurs</p>
+    </div>
+    <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800">
+        <p class="text-3xl font-bold text-amber-400">{{ valeur_catalogue }}€</p>
+        <p class="text-zinc-500 text-xs font-semibold tracking-widest uppercase mt-1">Valeur Catalogue</p>
+    </div>
+</div>
+
+<!-- ── Gestion des livres ──────────────────────────────────────────────────── -->
+<section class="mb-14">
+    <div class="flex items-center justify-between mb-4">
+        <div>
+            <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase">Gestion</p>
+            <h2 class="text-2xl font-bold text-white mt-0.5">Livres</h2>
+        </div>
+        <div class="flex items-center gap-3">
+            <a href="{% url 'backoffice:livres_list' %}" class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3 py-1.5 rounded transition-colors">
+                Voir tout
+            </a>
+            <a href="{% url 'backoffice:livre_create' %}" class="bg-amber-400 text-black font-semibold px-4 py-1.5 rounded-lg hover:bg-amber-300 transition-colors text-xs">
+                + Ajouter un livre
+            </a>
+        </div>
+    </div>
+    <div class="border-b border-zinc-800 mb-4"></div>
+    <div class="bg-zinc-900 rounded-xl border border-zinc-800 overflow-hidden">
+        <table class="w-full text-sm">
+            <thead>
+                <tr class="border-b border-zinc-800">
+                    <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Titre</th>
+                    <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Auteur</th>
+                    <th class="text-left px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase hidden md:table-cell">Genre</th>
+                    <th class="text-right px-5 py-3 text-zinc-400 font-semibold text-xs tracking-widest uppercase">Prix</th>
+                    <th class="px-5 py-3"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for livre in tous_les_livres %}
+                <tr class="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                    <td class="px-5 py-3 font-medium text-white">{{ livre.nom }}</td>
+                    <td class="px-5 py-3 text-zinc-400">{{ livre.auteur|default:"—" }}</td>
+                    <td class="px-5 py-3 hidden md:table-cell">
+                        <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_type.genre }}</span>
+                    </td>
+                    <td class="px-5 py-3 text-right text-amber-400 font-bold">{{ livre.prix }}€</td>
+                    <td class="px-5 py-3 text-right">
+                        <div class="flex items-center justify-end gap-2">
+                            <a href="{% url 'backoffice:livre_update' livre.pk %}" class="text-xs text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-2 py-1 rounded transition-colors">Modifier</a>
+                            <a href="{% url 'backoffice:livre_delete' livre.pk %}" class="text-xs text-red-400 hover:text-red-300 border border-red-900 hover:border-red-700 px-2 py-1 rounded transition-colors">Supprimer</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="px-5 py-8 text-center text-zinc-500">Aucun livre dans le catalogue</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<!-- ── Requêtes Django ─────────────────────────────────────────────────────── -->
+<div class="mb-8">
+    <p class="text-zinc-500 text-xs font-semibold tracking-widest uppercase mb-1">Exercice</p>
+    <h2 class="text-2xl font-bold text-white">Requêtes Django</h2>
+</div>
+
+{% include "backoffice/partials/query_section.html" with num="01" titre="Tous les livres créés" livres=tous_les_livres empty_msg="Aucun livre." %}
+{% include "backoffice/partials/query_section.html" with num="02" titre='Livres commençant par "L"' livres=livres_commencent_L empty_msg='Aucun livre commençant par "L".' %}
+{% include "backoffice/partials/query_section.html" with num="03" titre='Livres contenant "Misérables"' livres=livres_avec_miserables empty_msg="Aucun résultat." %}
+{% include "backoffice/partials/query_section.html" with num="04" titre="Livres dont le prix est ≥ 10 €" livres=livres_prix_gte_10 empty_msg="Aucun livre ≥ 10 €." %}
+{% include "backoffice/partials/query_section.html" with num="05" titre='Prix ≥ 10 € ET "toujours publié"' livres=livres_prix_10_et_publie empty_msg="Aucun résultat." %}
+
+<!-- 06 - Prix max -->
+<section class="mb-10">
+    <div class="mb-4">
+        <p class="text-amber-400 text-xs font-semibold tracking-widest">06</p>
+        <h2 class="text-2xl font-bold text-white mt-0.5">Livre avec le prix le plus élevé</h2>
+    </div>
+    <div class="border-b border-zinc-800 mb-6"></div>
+    {% if livre_prix_max %}
+    <div class="bg-zinc-900 border border-amber-400/30 rounded-xl p-6 flex items-center justify-between max-w-lg">
+        <div>
+            <h3 class="font-bold text-white text-lg">{{ livre_prix_max.nom }}</h3>
+            {% if livre_prix_max.auteur %}<p class="text-amber-400/70 text-sm">{{ livre_prix_max.auteur }}</p>{% endif %}
+            <div class="flex gap-2 mt-2">
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre_prix_max.livre_type.genre }}</span>
+                <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre_prix_max.livre_status.status }}</span>
+            </div>
+        </div>
+        <span class="text-amber-400 font-bold text-4xl ml-6">{{ livre_prix_max.prix }}€</span>
+    </div>
+    {% else %}
+    <p class="text-zinc-500 italic">Aucun livre.</p>
+    {% endif %}
+</section>
+
+<!-- 07 - Statuts -->
+<section class="mb-10">
+    <div class="mb-4">
+        <p class="text-amber-400 text-xs font-semibold tracking-widest">07</p>
+        <h2 class="text-2xl font-bold text-white mt-0.5">Liste des statuts</h2>
+    </div>
+    <div class="border-b border-zinc-800 mb-6"></div>
+    <div class="flex flex-wrap gap-3">
+        {% for status in statuts_livres %}
+        <span class="bg-zinc-900 border border-zinc-700 text-zinc-300 text-sm px-4 py-2 rounded-full">{{ status.status }}</span>
+        {% empty %}
+        <p class="text-zinc-500 italic">Aucun statut.</p>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- 08 - Compteur -->
+<section>
+    <div class="mb-4">
+        <p class="text-amber-400 text-xs font-semibold tracking-widest">08</p>
+        <h2 class="text-2xl font-bold text-white mt-0.5">Nombre total de livres</h2>
+    </div>
+    <div class="border-b border-zinc-800 mb-6"></div>
+    <div class="bg-zinc-900 border border-zinc-800 rounded-xl p-8 inline-flex items-end gap-3">
+        <span class="text-6xl font-bold text-amber-400 leading-none">{{ nombre_total_livres }}</span>
+        <span class="text-zinc-400 text-xl mb-1">livre{{ nombre_total_livres|pluralize }}</span>
+    </div>
+</section>
+{% endblock %}

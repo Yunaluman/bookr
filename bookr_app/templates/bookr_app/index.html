@@ -1,147 +1,88 @@
-{% load static %}
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bookr - Liste des Livres</title>
-    <link rel="stylesheet" href="{% static 'bookr_app/css/style.css' %}">
-</head>
-<body>
-    <div class="container">
-        <h1>Bookr - Gestion de Livres</h1>
+{% extends "bookr_app/base.html" %}
 
-        <!-- 1. Tous les livres créés -->
-        <div class="section">
-            <h2>1. Tous les livres créés</h2>
-            <div class="book-grid">
-                {% for livre in tous_les_livres %}
-                <div class="book-card">
-                    <div class="book-title">{{ livre.nom }}</div>
-                    <div class="book-price">{{ livre.prix }} €</div>
-                    <div class="book-info">
-                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
-                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
+{% block title %}Bookr — Catalogue{% endblock %}
+
+{% block content %}
+<div class="px-6 py-10">
+    <div class="max-w-7xl mx-auto">
+
+        <!-- Header -->
+        <div class="mb-8">
+            <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Catalogue</p>
+            <h1 class="text-4xl font-bold text-white mb-2">Tous les Livres</h1>
+            <p class="text-zinc-400 text-sm">Explorez notre bibliothèque numérique</p>
+        </div>
+
+        <!-- Recherche + filtres genre -->
+        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-6 flex-wrap">
+            <form method="get" class="flex items-center gap-3">
+                <div class="relative">
+                    <input type="text" name="q" value="{{ query }}" placeholder="Rechercher un titre..."
+                           class="bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-500 text-sm rounded-lg px-4 py-2 pl-9 focus:outline-none focus:border-amber-400 w-64">
+                    <svg class="absolute left-3 top-2.5 w-4 h-4 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0"/>
+                    </svg>
+                    {% if genre_id %}<input type="hidden" name="genre" value="{{ genre_id }}">{% endif %}
+                </div>
+                {% if query %}
+                <button type="submit" class="text-xs bg-amber-400 text-black font-semibold px-4 py-2 rounded-full hover:bg-amber-300 transition-colors">
+                    Chercher
+                </button>
+                <a href="{% url 'bookr_app:index' %}{% if genre_id %}?genre={{ genre_id }}{% endif %}" class="text-xs text-zinc-400 hover:text-white transition-colors">
+                    Effacer
+                </a>
+                {% endif %}
+            </form>
+            <div class="flex gap-2 flex-wrap">
+                <a href="{% url 'bookr_app:index' %}{% if query %}?q={{ query }}{% endif %}"
+                   class="text-xs border px-3 py-1.5 rounded-full transition-colors {% if not genre_id %}border-amber-400 text-amber-400{% else %}border-zinc-700 text-zinc-400 hover:border-amber-400 hover:text-amber-400{% endif %}">
+                    Tous
+                </a>
+                {% for type in tous_les_types %}
+                <a href="?genre={{ type.id }}{% if query %}&q={{ query }}{% endif %}"
+                   class="text-xs border px-3 py-1.5 rounded-full transition-colors {% if genre_id == type.id %}border-amber-400 text-amber-400{% else %}border-zinc-700 text-zinc-400 hover:border-amber-400 hover:text-amber-400{% endif %}">
+                    {{ type.genre|title }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="border-b border-zinc-800 mb-6"></div>
+
+        {% if query or genre_id %}
+        <p class="text-zinc-500 text-sm mb-4">
+            {{ livres|length }} résultat{{ livres|length|pluralize }}
+            {% if query %} pour "<span class="text-white">{{ query }}</span>"{% endif %}
+        </p>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for livre in livres %}
+            <div class="bg-zinc-900 rounded-xl p-5 border border-zinc-800 hover:border-zinc-700 transition-colors">
+                <div class="flex items-start justify-between gap-4">
+                    <div class="flex-1 min-w-0">
+                        <h3 class="font-semibold text-white truncate">{{ livre.nom }}</h3>
+                        {% if livre.auteur %}
+                        <a href="{% url 'bookr_app:auteur_detail' livre.auteur.id %}" class="text-amber-400/70 text-sm hover:text-amber-400 transition-colors">
+                            {{ livre.auteur }}
+                        </a>
+                        {% endif %}
+                        <div class="flex items-center gap-2 mt-2 flex-wrap">
+                            <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_type.genre }}</span>
+                            <span class="text-xs bg-zinc-800 text-zinc-300 px-2 py-0.5 rounded">{{ livre.livre_status.status }}</span>
+                        </div>
                     </div>
-                </div>
-                {% empty %}
-                <div class="no-result">Aucun livre trouvé</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 2. Livres qui commencent par "L" -->
-        <div class="section">
-            <h2>2. Livres qui commencent par "L"</h2>
-            <div class="book-grid">
-                {% for livre in livres_commencent_L %}
-                <div class="book-card">
-                    <div class="book-title">{{ livre.nom }}</div>
-                    <div class="book-price">{{ livre.prix }} €</div>
-                    <div class="book-info">
-                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
-                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="no-result">Aucun livre commençant par "L"</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 3. Livres contenant "Misérables" -->
-        <div class="section">
-            <h2>3. Livres contenant "Misérables" dans le titre</h2>
-            <div class="book-grid">
-                {% for livre in livres_avec_miserables %}
-                <div class="book-card">
-                    <div class="book-title">{{ livre.nom }}</div>
-                    <div class="book-price">{{ livre.prix }} €</div>
-                    <div class="book-info">
-                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
-                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="no-result">Aucun livre contenant "Misérables"</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 4. Livres avec prix >= 10 -->
-        <div class="section">
-            <h2>4. Livres dont le prix est >= 10 €</h2>
-            <div class="book-grid">
-                {% for livre in livres_prix_gte_10 %}
-                <div class="book-card">
-                    <div class="book-title">{{ livre.nom }}</div>
-                    <div class="book-price">{{ livre.prix }} €</div>
-                    <div class="book-info">
-                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
-                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="no-result">Aucun livre avec prix >= 10 €</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 5. Livres prix >= 10 ET toujours publié -->
-        <div class="section">
-            <h2>5. Livres prix >= 10 € ET statut "toujours publié"</h2>
-            <div class="book-grid">
-                {% for livre in livres_prix_10_et_publie %}
-                <div class="book-card">
-                    <div class="book-title">{{ livre.nom }}</div>
-                    <div class="book-price">{{ livre.prix }} €</div>
-                    <div class="book-info">
-                        <span class="badge badge-type">{{ livre.livre_type.genre }}</span>
-                        <span class="badge badge-status">{{ livre.livre_status.status }}</span>
-                    </div>
-                </div>
-                {% empty %}
-                <div class="no-result">Aucun livre correspondant à ces critères</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 6. Livre avec le prix le plus élevé -->
-        <div class="section">
-            <h2>6. Livre avec le prix le plus élevé</h2>
-            {% if livre_prix_max %}
-            <div class="highlight">
-                <div class="book-title">{{ livre_prix_max.nom }}</div>
-                <div class="book-price">{{ livre_prix_max.prix }} €</div>
-                <div class="book-info">
-                    <span class="badge badge-type">{{ livre_prix_max.livre_type.genre }}</span>
-                    <span class="badge badge-status">{{ livre_prix_max.livre_status.status }}</span>
+                    <span class="text-amber-400 font-bold text-lg shrink-0">{{ livre.prix }}€</span>
                 </div>
             </div>
-            {% else %}
-            <div class="no-result">Aucun livre trouvé</div>
-            {% endif %}
+            {% empty %}
+            <div class="col-span-3 text-center py-16 text-zinc-500">
+                <p class="text-lg">Aucun livre trouvé</p>
+                {% if query %}<p class="text-sm mt-1">Essayez un autre terme de recherche</p>{% endif %}
+            </div>
+            {% endfor %}
         </div>
 
-        <!-- 7. Liste des statuts -->
-        <div class="section">
-            <h2>7. Liste des statuts de nos livres</h2>
-            <div class="status-list">
-                {% for status in statuts_livres %}
-                <div class="status-item">{{ status.status }}</div>
-                {% empty %}
-                <div class="no-result">Aucun statut trouvé</div>
-                {% endfor %}
-            </div>
-        </div>
-
-        <!-- 8. Nombre total de livres -->
-        <div class="section">
-            <h2>8. Nombre total de livres</h2>
-            <div class="highlight">
-                <span class="count-badge">{{ nombre_total_livres }} livre{{ nombre_total_livres|pluralize }}</span>
-            </div>
-        </div>
     </div>
-</body>
-</html>
+</div>
+{% endblock %}

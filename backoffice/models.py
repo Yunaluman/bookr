@@ -18,6 +18,20 @@ class ProductItem(models.Model):
         return f"{self.product.name} - {self.color} [{self.code}]"
 
 
+class Auteur(models.Model):
+    prenom = models.CharField(max_length=100)
+    nom = models.CharField(max_length=100)
+    nationalite = models.CharField(max_length=100, blank=True)
+
+    def __str__(self):
+        return f"{self.prenom} {self.nom}"
+
+    class Meta:
+        verbose_name = "Auteur"
+        verbose_name_plural = "Auteurs"
+        ordering = ['nom', 'prenom']
+
+
 class LivreType(models.Model):
     genre = models.CharField(max_length=100, unique=True)
 
@@ -43,6 +57,13 @@ class LivreStatus(models.Model):
 class Livre(models.Model):
     nom = models.CharField(max_length=200)
     prix = models.DecimalField(max_digits=10, decimal_places=2)
+    auteur = models.ForeignKey(
+        Auteur,
+        on_delete=models.PROTECT,
+        related_name='livres',
+        null=True,
+        blank=True
+    )
     livre_type = models.ForeignKey(
         LivreType,
         on_delete=models.PROTECT,

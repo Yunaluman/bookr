@@ -1,0 +1,69 @@
+{% extends "bookr_app/base.html" %}
+
+{% block title %}Bookr — Auteurs{% endblock %}
+
+{% block content %}
+<div class="px-6 py-10">
+    <div class="max-w-7xl mx-auto">
+
+        <div class="mb-8">
+            <p class="text-amber-400 text-xs font-semibold tracking-widest uppercase mb-2">Bibliothèque</p>
+            <h1 class="text-4xl font-bold text-white mb-2">Les Auteurs</h1>
+            <p class="text-zinc-400 text-sm">{{ auteurs|length }} auteur{{ auteurs|length|pluralize }} dans le catalogue</p>
+        </div>
+
+        <!-- Filtres nationalité -->
+        {% if nationalites %}
+        <div class="flex gap-2 flex-wrap mb-6">
+            <a href="{% url 'bookr_app:auteurs_list' %}"
+               class="text-xs border px-3 py-1.5 rounded-full transition-colors {% if not nationalite_active %}border-amber-400 text-amber-400{% else %}border-zinc-700 text-zinc-400 hover:border-amber-400 hover:text-amber-400{% endif %}">
+                Toutes
+            </a>
+            {% for nat in nationalites %}
+            <a href="?nationalite={{ nat }}"
+               class="text-xs border px-3 py-1.5 rounded-full transition-colors {% if nationalite_active == nat %}border-amber-400 text-amber-400{% else %}border-zinc-700 text-zinc-400 hover:border-amber-400 hover:text-amber-400{% endif %}">
+                {{ nat }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="border-b border-zinc-800 mb-6"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {% for auteur in auteurs %}
+            <a href="{% url 'bookr_app:auteur_detail' auteur.id %}"
+               class="bg-zinc-900 rounded-xl p-6 border border-zinc-800 hover:border-amber-400/50 transition-colors group block">
+                <div class="flex items-start justify-between">
+                    <div>
+                        <h3 class="font-bold text-white text-lg group-hover:text-amber-400 transition-colors">{{ auteur }}</h3>
+                        {% if auteur.nationalite %}
+                        <p class="text-zinc-500 text-sm mt-1">{{ auteur.nationalite }}</p>
+                        {% endif %}
+                    </div>
+                    <span class="bg-zinc-800 text-zinc-400 text-xs px-2 py-1 rounded-full shrink-0">
+                        {{ auteur.livres.count }} livre{{ auteur.livres.count|pluralize }}
+                    </span>
+                </div>
+                {% if auteur.livres.all %}
+                <div class="mt-4 flex flex-wrap gap-1">
+                    {% for livre in auteur.livres.all|slice:":3" %}
+                    <span class="text-xs text-zinc-500 bg-zinc-800 px-2 py-0.5 rounded truncate max-w-32">{{ livre.nom }}</span>
+                    {% endfor %}
+                    {% if auteur.livres.count > 3 %}
+                    <span class="text-xs text-zinc-600">+{{ auteur.livres.count|add:"-3" }}</span>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </a>
+            {% empty %}
+            <div class="col-span-3 text-center py-16 text-zinc-500">
+                <p class="text-lg">Aucun auteur trouvé</p>
+                {% if nationalite_active %}<p class="text-sm mt-1">pour la nationalité "{{ nationalite_active }}"</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

@@ -1,79 +1,107 @@
 # -*- coding: utf-8 -*-
-"""
-Management command pour peupler la base de données avec les livres
-Usage: python manage.py populate_books
-"""
 from django.core.management.base import BaseCommand
-from backoffice.models import Livre, LivreType, LivreStatus
+from backoffice.models import Auteur, Livre, LivreType, LivreStatus
 
 
 class Command(BaseCommand):
-    help = 'Peuple la base de données avec les livres de test'
+    help = 'Peuple la base de données avec des données diversifiées'
 
     def handle(self, *args, **options):
         self.stdout.write(self.style.SUCCESS('=== Création des données ===\n'))
 
-        # 1. Créer les LivreType
-        self.stdout.write('1. Création des types de livres...')
-        genre_roman, created = LivreType.objects.get_or_create(genre="roman")
-        self.stdout.write(f"   - Type 'roman' {'créé' if created else 'existe déjà'}")
+        # ── Genres ────────────────────────────────────────────────────────────
+        self.stdout.write('1. Genres...')
+        roman, _       = LivreType.objects.get_or_create(genre="roman")
+        nouvelle, _    = LivreType.objects.get_or_create(genre="nouvelle")
+        polar, _       = LivreType.objects.get_or_create(genre="polar")
+        biographie, _  = LivreType.objects.get_or_create(genre="biographie")
+        classique, _   = LivreType.objects.get_or_create(genre="classique")
+        self.stdout.write('   OK\n')
 
-        genre_nouvelle, created = LivreType.objects.get_or_create(genre="nouvelle")
-        self.stdout.write(f"   - Type 'nouvelle' {'créé' if created else 'existe déjà'}")
+        # ── Statuts ───────────────────────────────────────────────────────────
+        self.stdout.write('2. Statuts...')
+        publie, _       = LivreStatus.objects.get_or_create(status="toujours publié")
+        arret, _        = LivreStatus.objects.get_or_create(status="en arrêt de commercialisation")
+        reimpression, _ = LivreStatus.objects.get_or_create(status="réimpression")
+        self.stdout.write('   OK\n')
 
-        genre_polar, created = LivreType.objects.get_or_create(genre="polar")
-        self.stdout.write(f"   - Type 'polar' {'créé' if created else 'existe déjà'}")
+        # ── Auteurs (5 nationalités différentes) ──────────────────────────────
+        self.stdout.write('3. Auteurs...')
+        auteurs_data = [
+            ("Victor",      "Hugo",          "Française"),
+            ("Gustave",     "Flaubert",      "Française"),
+            ("Honoré de",   "Balzac",        "Française"),
+            ("Alexandre",   "Dumas",         "Française"),
+            ("Albert",      "Camus",         "Française"),
+            ("George",      "Orwell",        "Britannique"),
+            ("Arthur",      "Conan Doyle",   "Britannique"),
+            ("Agatha",      "Christie",      "Britannique"),
+            ("Ernest",      "Hemingway",     "Américaine"),
+            ("Stephen",     "King",          "Américaine"),
+            ("Franz",       "Kafka",         "Autrichienne"),
+            ("Fyodor",      "Dostoïevski",   "Russe"),
+        ]
+        auteurs = {}
+        for prenom, nom, nat in auteurs_data:
+            a, created = Auteur.objects.get_or_create(
+                prenom=prenom, nom=nom,
+                defaults={'nationalite': nat}
+            )
+            auteurs[nom] = a
+            self.stdout.write(f"   - {prenom} {nom} {'créé' if created else 'existe déjà'}")
+        self.stdout.write('')
 
-        genre_biographie, created = LivreType.objects.get_or_create(genre="biographie")
-        self.stdout.write(f"   - Type 'biographie' {'créé' if created else 'existe déjà'}\n")
+        # ── Livres ────────────────────────────────────────────────────────────
+        self.stdout.write('4. Livres...')
+        livres_data = [
+            # (nom, prix, auteur_nom, genre, statut)
+            ("Les Misérables",              8.50,  "Hugo",         roman,      publie),
+            ("Notre-Dame de Paris",         9.90,  "Hugo",         roman,      publie),
+            ("Les Contemplations",          6.00,  "Hugo",         nouvelle,   reimpression),
+            ("Madame Bovary",               7.00,  "Flaubert",     roman,      publie),
+            ("L'Éducation sentimentale",    8.00,  "Flaubert",     roman,      publie),
+            ("Le Père Goriot",             11.00,  "Balzac",       roman,      publie),
+            ("Eugénie Grandet",             9.50,  "Balzac",       roman,      publie),
+            ("Les Trois Mousquetaires",    12.00,  "Dumas",        roman,      publie),
+            ("Le Comte de Monte-Cristo",   14.90,  "Dumas",        roman,      publie),
+            ("L'Étranger",                  7.50,  "Camus",        roman,      publie),
+            ("La Peste",                    8.00,  "Camus",        roman,      publie),
+            ("1984",                       10.00,  "Orwell",       roman,      publie),
+            ("La Ferme des animaux",        6.50,  "Orwell",       nouvelle,   publie),
+            ("Sherlock Holmes",             9.00,  "Conan Doyle",  polar,      reimpression),
+            ("Le Chien des Baskerville",   10.50,  "Conan Doyle",  polar,      publie),
+            ("Dix Petits Nègres",           8.90,  "Christie",     polar,      publie),
+            ("Le Crime de l'Orient-Express",9.90,  "Christie",     polar,      publie),
+            ("L'Adieu aux armes",           8.00,  "Hemingway",    roman,      arret),
+            ("Le Vieil Homme et la Mer",    7.00,  "Hemingway",    nouvelle,   publie),
+            ("Shining",                    13.00,  "King",         polar,      publie),
+            ("Ça",                         15.90,  "King",         polar,      publie),
+            ("La Métamorphose",             5.50,  "Kafka",        nouvelle,   reimpression),
+            ("Le Procès",                   8.50,  "Kafka",        roman,      publie),
+            ("Crime et Châtiment",         11.50,  "Dostoïevski",  roman,      publie),
+            ("L'Idiot",                    12.00,  "Dostoïevski",  roman,      reimpression),
+        ]
 
-        # 2. Créer les LivreStatus
-        self.stdout.write('2. Création des statuts de livres...')
-        status_publie, created = LivreStatus.objects.get_or_create(status="toujours publié")
-        self.stdout.write(f"   - Statut 'toujours publié' {'créé' if created else 'existe déjà'}")
+        nb_crees = 0
+        for nom, prix, auteur_nom, genre, statut in livres_data:
+            _, created = Livre.objects.get_or_create(
+                nom=nom,
+                defaults={
+                    'prix': prix,
+                    'auteur': auteurs[auteur_nom],
+                    'livre_type': genre,
+                    'livre_status': statut,
+                }
+            )
+            if created:
+                nb_crees += 1
+            self.stdout.write(f"   - '{nom}' {'créé' if created else 'existe déjà'}")
 
-        status_arret, created = LivreStatus.objects.get_or_create(
-            status="en arrêt de commercialisation"
-        )
-        self.stdout.write(f"   - Statut 'en arrêt de commercialisation' {'créé' if created else 'existe déjà'}")
-
-        status_reimpression, created = LivreStatus.objects.get_or_create(status="réimpression")
-        self.stdout.write(f"   - Statut 'réimpression' {'créé' if created else 'existe déjà'}\n")
-
-        # 3. Créer les 3 Livres
-        self.stdout.write('3. Création des livres...')
-
-        livre1, created = Livre.objects.get_or_create(
-            nom="Les Misérables",
-            defaults={
-                'prix': 8,
-                'livre_type': genre_roman,
-                'livre_status': status_publie
-            }
-        )
-        self.stdout.write(f"   - 'Les Misérables' {'créé' if created else 'existe déjà'}")
-
-        livre2, created = Livre.objects.get_or_create(
-            nom="Madame Bovary",
-            defaults={
-                'prix': 7,
-                'livre_type': genre_roman,
-                'livre_status': status_publie
-            }
-        )
-        self.stdout.write(f"   - 'Madame Bovary' {'créé' if created else 'existe déjà'}")
-
-        livre3, created = Livre.objects.get_or_create(
-            nom="Honoré de Balzac",
-            defaults={
-                'prix': 11,
-                'livre_type': genre_roman,
-                'livre_status': status_publie
-            }
-        )
-        self.stdout.write(f"   - 'Honoré de Balzac' {'créé' if created else 'existe déjà'}\n")
-
+        self.stdout.write('')
         self.stdout.write(self.style.SUCCESS('=== Données créées avec succès! ==='))
-        self.stdout.write(f"\nNombre total de livres: {Livre.objects.count()}")
-        self.stdout.write(f"Nombre total de types: {LivreType.objects.count()}")
-        self.stdout.write(f"Nombre total de statuts: {LivreStatus.objects.count()}")
+        self.stdout.write(
+            f"Livres: {Livre.objects.count()} ({nb_crees} nouveaux) | "
+            f"Auteurs: {Auteur.objects.count()} | "
+            f"Genres: {LivreType.objects.count()} | "
+            f"Statuts: {LivreStatus.objects.count()}"
+        )
