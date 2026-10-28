@@ -1,49 +1,51 @@
-# Bookr — Application de gestion de bibliothèque
+# Bookr — Library management app
 
-Projet Django développé dans le cadre du cours M2. Application complète avec site public, espace backoffice et gestion de la base via des commandes Django.
+**English** · [Français](README.fr.md)
+
+A Django project built for a Master's (M2) course. A complete app with a public site, a back-office and database management through Django commands.
 
 ---
 
-## Stack technique
+## Tech stack
 
-| Outil | Version |
+| Tool | Version |
 |---|---|
 | Python | 3.13 |
 | Django | 6.0.3 |
 | PostgreSQL | — |
 | Tailwind CSS | 4.x (via django-tailwind) |
-| Node.js | requis pour le build Tailwind |
+| Node.js | required for the Tailwind build |
 
 ---
 
-## Structure du projet
+## Project structure
 
 ```
-bookr/                          ← racine Django (manage.py ici)
-├── bookr/                      ← configuration projet
+bookr/                          ← Django root (manage.py here)
+├── bookr/                      ← project configuration
 │   ├── settings.py
 │   └── urls.py
-├── bookr_app/                  ← site public
-│   ├── views.py                ← catalogue, auteurs
+├── bookr_app/                  ← public site
+│   ├── views.py                ← catalog, authors
 │   ├── urls.py
 │   └── templates/bookr_app/
 │       ├── base.html
-│       ├── index.html          ← catalogue + recherche + filtres genre
-│       ├── auteurs.html        ← liste auteurs + filtre nationalité
-│       └── auteur_detail.html  ← fiche auteur
-├── backoffice/                 ← espace de gestion
+│       ├── index.html          ← catalog + search + genre filters
+│       ├── auteurs.html        ← author list + nationality filter
+│       └── auteur_detail.html  ← author page
+├── backoffice/                 ← management area
 │   ├── models.py               ← Auteur, Livre, LivreType, LivreStatus
-│   ├── views.py                ← dashboard + CRUD livres & auteurs
+│   ├── views.py                ← dashboard + books & authors CRUD
 │   ├── forms.py
 │   ├── urls.py
 │   ├── admin.py
 │   └── templates/backoffice/
 │       ├── base.html
-│       ├── index.html          ← dashboard (requêtes + gestion livres)
+│       ├── index.html          ← dashboard (queries + book management)
 │       ├── livres/             ← list, form, confirm_delete
 │       └── auteurs/            ← list, form, confirm_delete
-├── theme/                      ← app django-tailwind
-│   └── static_src/             ← sources Node (package.json, styles.css)
+├── theme/                      ← django-tailwind app
+│   └── static_src/             ← Node sources (package.json, styles.css)
 └── manage.py
 ```
 
@@ -51,21 +53,21 @@ bookr/                          ← racine Django (manage.py ici)
 
 ## Installation
 
-### 1. Dépendances Python
+### 1. Python dependencies
 
 ```bash
 pip install django psycopg2-binary django-tailwind[cookiecutter,honcho,reload]
 ```
 
-### 2. Base de données PostgreSQL
+### 2. PostgreSQL database
 
-Créer la base avant de migrer :
+Create the database before migrating:
 
 ```sql
 CREATE DATABASE bookr_db ENCODING 'UTF8';
 ```
 
-Configurer `bookr/settings.py` si nécessaire (HOST, PORT, USER, PASSWORD).
+Adjust `bookr/settings.py` if needed (HOST, PORT, USER, PASSWORD).
 
 ### 3. Migrations
 
@@ -73,22 +75,22 @@ Configurer `bookr/settings.py` si nécessaire (HOST, PORT, USER, PASSWORD).
 python manage.py migrate
 ```
 
-### 4. Données initiales
+### 4. Seed data
 
 ```bash
 python manage.py populate_books
 ```
 
-Crée 12 auteurs (5 nationalités), 25 livres, 5 genres et 3 statuts.
+Creates 12 authors (5 nationalities), 25 books, 5 genres and 3 statuses.
 
 ### 5. Build Tailwind CSS
 
 ```bash
-python manage.py tailwind install   # première fois uniquement
-python manage.py tailwind build     # compile le CSS
+python manage.py tailwind install   # first time only
+python manage.py tailwind build     # compiles the CSS
 ```
 
-### 6. Lancer le serveur
+### 6. Run the server
 
 ```bash
 python manage.py runserver
@@ -100,75 +102,77 @@ python manage.py runserver
 
 | URL | Description |
 |---|---|
-| `/` | Catalogue public — recherche + filtre par genre |
-| `/auteurs/` | Liste des auteurs — filtre par nationalité |
-| `/auteurs/<id>/` | Fiche auteur + ses livres |
-| `/backoffice/` | Dashboard — requêtes Django + gestion livres |
-| `/backoffice/livres/` | Liste complète des livres |
-| `/backoffice/livres/ajouter/` | Formulaire d'ajout |
-| `/backoffice/livres/<id>/modifier/` | Formulaire d'édition |
-| `/backoffice/livres/<id>/supprimer/` | Confirmation de suppression |
-| `/backoffice/auteurs/` | Gestion des auteurs (même structure) |
-| `/admin/` | Interface d'administration Django |
+| `/` | Public catalog — search + genre filter |
+| `/auteurs/` | Author list — nationality filter |
+| `/auteurs/<id>/` | Author page + their books |
+| `/backoffice/` | Dashboard — Django queries + book management |
+| `/backoffice/livres/` | Full book list |
+| `/backoffice/livres/ajouter/` | Add form |
+| `/backoffice/livres/<id>/modifier/` | Edit form |
+| `/backoffice/livres/<id>/supprimer/` | Delete confirmation |
+| `/backoffice/auteurs/` | Author management (same structure) |
+| `/admin/` | Django admin |
 
 ---
 
-## Modèles
+## Models
 
 ```
 Auteur        prenom, nom, nationalite
-LivreType     genre (roman, nouvelle, polar, biographie, classique)
-LivreStatus   status (toujours publié, réimpression, en arrêt de commercialisation)
+LivreType     genre (novel, short story, crime, biography, classic)
+LivreStatus   status (still in print, reprint, out of print)
 Livre         nom, prix, auteur (FK), livre_type (FK), livre_status (FK)
 ```
 
+Model and field names are in French (`Auteur` = author, `Livre` = book, `prix` = price).
+
 ---
 
-## Commandes de gestion
+## Management commands
 
 ```bash
-# Peupler la base avec les données de démonstration (idempotent)
+# Seed the database with demo data (idempotent)
 python manage.py populate_books
 
-# Modifier certains statuts de livres (exercice)
+# Change some book statuses (exercise)
 python manage.py modify_books
 
-# Remettre la base à zéro
+# Reset the database
 python manage.py reset_books
-python manage.py reset_books --no-input   # sans confirmation
+python manage.py reset_books --no-input   # without confirmation
 ```
 
 ---
 
-## Développement avec Tailwind
+## Developing with Tailwind
 
-Deux terminaux en parallèle :
+Two terminals side by side:
 
 ```bash
 # Terminal 1
 python manage.py runserver
 
-# Terminal 2 — recompile le CSS à chaque modification de template
+# Terminal 2 — recompiles the CSS on every template change
 python manage.py tailwind start
 ```
 
-> Sur Windows, `tailwind dev` (qui lance les deux simultanément) n'est pas supporté.
+> On Windows, `tailwind dev` (which runs both at once) is not supported.
 
 ---
 
-## Administration Django
+## Django admin
 
 ```bash
 python manage.py createsuperuser
 ```
 
-Accessible sur `/admin/` — gestion complète des modèles avec filtres, recherche et fieldsets configurés.
+Available at `/admin/` — full model management with filters, search and configured fieldsets.
 
 ---
 
-## Requêtes Django (dashboard backoffice)
+## Django queries (back-office dashboard)
 
-Le dashboard `/backoffice/` illustre 8 requêtes ORM :
+The `/backoffice/` dashboard demonstrates 8 ORM queries:
 
 1. `Livre.objects.all()`
 2. `Livre.objects.filter(nom__startswith="L")`
